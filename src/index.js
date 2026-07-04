@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import productRoutes from "./routes/product.route.js";
 import userRoutes from "./routes/user.route.js";
+import authRoutes from "./routes/auth.route.js";
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ app.get("/api/health", (req, res) => {
     database: "MongoDB Atlas",
   });
 });
-
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 
