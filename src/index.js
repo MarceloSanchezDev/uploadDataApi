@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(
   cors(
 {
-    origin: "https://front-upload-data-api.vercel.app/",
+    origin: "https://front-upload-data-api.vercel.app",
     credentials: true,
   })
 );  
