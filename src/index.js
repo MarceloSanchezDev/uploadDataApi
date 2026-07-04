@@ -13,13 +13,25 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://front-upload-data-api.vercel.app",
+];
+
 app.use(
-  cors(
-{
-    origin: "https://front-upload-data-api.vercel.app",
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
-);  
+); 
 
 app.get("/", (req, res) => {
   res.status(200).json({
