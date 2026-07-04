@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import { connectDB } from "./config/db.js";
 import productRoutes from "./routes/product.route.js";
 import userRoutes from "./routes/user.route.js";
@@ -10,8 +11,18 @@ dotenv.config();
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+{
+    origin: "https://front-upload-data-api.vercel.app/",
+    credentials: true,
+  })
+);  
 
 app.get("/", (req, res) => {
   res.status(200).json({
