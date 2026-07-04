@@ -6,7 +6,9 @@ export const connectDB = async () => {
       throw new Error("Falta MONGODB_URI en el archivo .env");
     }
 
-    const connection = await mongoose.connect(process.env.MONGODB_URI);
+    const connection = await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+    });
 
     console.log(`MongoDB conectado en: ${connection.connection.host}`);
     console.log(`Base de datos: ${connection.connection.name}`);

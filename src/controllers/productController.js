@@ -1,38 +1,64 @@
-const products = [
-{
-        id: 1,
-        nombre : "producto 1",
-        precio : 1200
-    }
-]
+import Product from "../models/product.model.js";
 
-export const allProducts = (req,res)=>{
-    res.status(200).json(products)
-} 
+export const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find().sort({ createdAt: -1 });
 
-export const oneProduct = (req,res)=>{
-    console.log(req.body)
-    const {id} = req.body
-    const product = products.find(prodcutoToFind => prodcutoToFind.id === id)
-    if(product){
-        res.status(200).json(product)
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error al obtener productos",
+      error: error.message,
+    });
+  }
+};
+
+export const getOneProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Producto no encontrado",
+      });
     }
-    res.status(400).json({message : "Producto no encontrado"})
-}
-export const addProduct = async (req,res)=>{
-    const {nombre,precio,descripcion,categoria} = req.body
-    const newProduct = {
-        nombre,
-        precio,
-        descripcion,
-        categoria}
-    try {
-    const producto = await Producto.create(newProduct);
+
+    res.status(200).json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "ID de producto inválido",
+      error: error.message,
+    });
+  }
+};
+
+export const createProduct = async (req, res) => {
+  try {
+    const { nombre, precio, descripcion, categoria } = req.body;
+
+    const product = await Product.create({
+      nombre,
+      precio,
+      descripcion,
+      categoria,
+    });
 
     res.status(201).json({
       success: true,
       message: "Producto creado correctamente",
-      data: producto,
+      data: product,
     });
   } catch (error) {
     res.status(400).json({
@@ -41,25 +67,61 @@ export const addProduct = async (req,res)=>{
       error: error.message,
     });
   }
-}
+};
 
-export const deleteProduct = (req,res)=>{
-    const {id} = req.body
-    const productToDelete = products.find(productToFind => productToFind.id === id)
-    if(productToDelete){
-        const newProducts = products.filter(productToFind => productToFind.id !== id)
-        return res.status(200).json({message : "Producto eliminado correctamente", product: productToDelete, products: newProducts})
-    }
-    res.status(400).json({message : "Producto no encontrado"})
-}
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-export const updateProduct = (req,res)=>{
-    const {id,nombre,precio} = req.body
-    const productToUpdate = products.find(productToFind => productToFind.id === id)
-    if(productToUpdate){
-        productToUpdate.nombre = nombre
-        productToUpdate.precio = precio
-        return res.status(200).json({message : "Producto actualizado correctamente", product: productToUpdate, products})
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Producto no encontrado",
+      });
     }
-    res.status(400).json({message : "Producto no encontrado"})
-}
+
+    res.status(200).json({
+      success: true,
+      message: "Producto eliminado correctamente",
+      data: product,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Error al eliminar producto",
+      error: error.message,
+    });
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Producto no encontrado",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Producto actualizado correctamente",
+      data: product,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: "Error al actualizar producto",
+      error: error.message,
+    });
+  }
+};

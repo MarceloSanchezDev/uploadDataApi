@@ -1,14 +1,16 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
+import productRoutes from "./routes/product.route.js";
+import userRoutes from "./routes/user.route.js";
 
 dotenv.config();
 
 const app = express();
 
-app.use(express.json());
-
 const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -21,14 +23,24 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "API funcionando correctamente",
+    database: "MongoDB Atlas",
   });
 });
+
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
 
 const startServer = async () => {
   try {
     console.log("Iniciando servidor...");
     console.log("PORT:", PORT);
     console.log("MONGODB_URI existe:", Boolean(process.env.MONGODB_URI));
+    console.log(
+      "Tipo de conexión:",
+      process.env.MONGODB_URI?.startsWith("mongodb+srv://")
+        ? "MongoDB Atlas"
+        : "MongoDB local/Docker"
+    );
 
     await connectDB();
 
